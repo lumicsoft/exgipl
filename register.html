@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register | Earn USDT</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="style.css"> 
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #050505; color: white; }
+        .orbitron { font-family: 'Orbitron', sans-serif; }
+        .glass-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); backdrop-filter: blur(20px); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
+        .text-gradient { background: linear-gradient(to right, #10b981, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .input-field { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); padding: 14px; border-radius: 16px; width: 100%; color: white; outline: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .input-field:focus { border-color: #10b981; box-shadow: 0 0 20px rgba(16, 185, 129, 0.15); background: rgba(0,0,0,0.6); }
+        .usdt-glow { box-shadow: 0 0 30px rgba(16, 185, 129, 0.1); }
+        .btn-primary { background: linear-gradient(135deg, #10b981 0%, #059669 100%); transition: all 0.3s ease; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(16, 185, 129, 0.2); filter: brightness(1.1); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <script src="components.js"></script>
+
+    <main class="flex-grow flex items-center justify-center px-6 py-20 relative overflow-hidden">
+        <div class="absolute top-1/4 left-1/4 w-[400px] h-[400px] bg-emerald-500/10 rounded-full blur-[120px] -z-10 animate-pulse"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-[300px] h-[300px] bg-blue-500/10 rounded-full blur-[100px] -z-10"></div>
+
+        <div class="glass-card w-full max-w-md p-10 rounded-[2.5rem] relative usdt-glow">
+            <div class="text-center mb-10">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-emerald-500/10 mb-6 border border-emerald-500/20">
+                    <i data-lucide="user-plus" class="w-8 h-8 text-emerald-500"></i>
+                </div>
+                <h1 class="text-3xl font-black orbitron uppercase tracking-tighter mb-2">Join <span class="text-gradient">Matrix</span></h1>
+                <p class="text-gray-400 text-[10px] tracking-[0.3em] uppercase font-bold">Smart USDT Protocol v4.0</p>
+            </div>
+
+            <div class="space-y-6">
+                <div class="relative">
+                    <label class="block text-[9px] font-black text-gray-500 uppercase tracking-[0.2em] mb-2 ml-1">Unique Username</label>
+                    <div class="relative">
+                        <i data-lucide="at-sign" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"></i>
+                        <input type="text" id="reg-username" placeholder="e.g. crypto_king" class="input-field pl-12">
+                    </div>
+                </div>
+
+                <div class="relative">
+                    <label class="block text-[9px] font-black text-gray-500 uppercase tracking-[0.2em] mb-2 ml-1">Invited By (Referrer)</label>
+                    <div class="relative">
+                        <i data-lucide="users" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"></i>
+                        <input type="text" id="reg-referrer" placeholder="Referrer ID" class="input-field pl-12">
+                    </div>
+                    <p id="ref-status" class="text-[9px] mt-3 text-emerald-500 hidden italic font-bold uppercase flex items-center gap-1">
+                        <i data-lucide="check-circle" class="w-3 h-3"></i> Referral Link Active
+                    </p>
+                </div>
+
+                <button onclick="initiateRegister()" id="reg-btn" class="btn-primary w-full py-5 orbitron font-black tracking-[0.2em] rounded-2xl text-black text-sm uppercase">
+                    Register Account
+                </button>
+
+                <div class="pt-4 border-t border-white/5">
+                    <p class="text-center text-[10px] text-gray-500 uppercase tracking-widest font-semibold">
+                        Already part of the network? <br>
+                        <a href="#" onclick="initiateLogin()" class="text-emerald-400 hover:text-emerald-300 cursor-pointer inline-block mt-2 transition-colors underline underline-offset-4">Connect & Login</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="web3-handler.js"></script>
+
+    <script>
+        // Initialize Icons
+        lucide.createIcons();
+
+        // Referral Auto-fill Logic
+        window.addEventListener('load', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const ref = urlParams.get('ref');
+            if (ref) {
+                const el = document.getElementById('reg-referrer');
+                el.value = ref; 
+                el.readOnly = true; 
+                el.style.opacity = "0.7";
+                el.style.borderColor = "rgba(16, 185, 129, 0.4)";
+                document.getElementById('ref-status').classList.remove('hidden');
+                lucide.createIcons();
+            }
+        });
+
+        // Bridge functions to web3-handler.js
+        async function initiateRegister() {
+            const btn = document.getElementById('reg-btn');
+            const originalText = btn.innerText;
+            
+            try {
+                if (window.handleRegister && typeof window.handleRegister === 'function') {
+                    btn.disabled = true;
+                    btn.innerText = "WAITING FOR WALLET...";
+                    await window.handleRegister();
+                } else {
+                    alert("System initializing... Please wait 2 seconds.");
+                }
+            } catch (err) {
+                console.error(err);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = originalText;
+            }
+        }
+
+        async function initiateLogin() {
+            if (window.handleLogin && typeof window.handleLogin === 'function') {
+                await window.handleLogin();
+            } else {
+                alert("Please ensure MetaMask is connected.");
+            }
+        }
+    </script>
+</body>
+</html>

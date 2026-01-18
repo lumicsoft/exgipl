@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leadership | Earn USDT</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="style1.css">
+    <style>
+        .usdt-icon { width: 18px; height: 18px; display: inline-block; vertical-align: middle; margin-right: 4px; }
+        .usdt-icon-sm { width: 14px; height: 14px; display: inline-block; vertical-align: middle; margin-right: 2px; }
+        .premium-border { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; }
+        .progress-bar { transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1); }
+    </style>
+</head>
+<body class="bg-[#050505] text-white">
+
+    <main class="max-w-7xl mx-auto px-6 relative z-10 pt-10 pb-20">
+        
+        <div class="mb-8">
+            <h1 class="text-3xl font-black orbitron italic uppercase tracking-tighter">Leadership <span class="text-green-500">Overview</span></h1>
+            <p class="text-gray-400 text-xs font-bold uppercase tracking-widest">Team Performance & Rankings</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="premium-border p-6 flex items-center justify-between border-green-500/30 bg-green-500/5">
+                <div>
+                    <p class="text-[10px] font-black text-gray-400 uppercase">Current Rank</p>
+                    <h2 id="rank-display" class="text-2xl font-black orbitron text-white">USER</h2>
+                    <p id="rank-status" class="text-green-400 font-bold text-[10px] mt-1 italic">Active Participant</p>
+                </div>
+                <i data-lucide="shield-check" class="w-12 h-12 text-green-400 opacity-50"></i>
+            </div>
+            <div class="premium-border p-6 flex items-center justify-between border-yellow-500/30 bg-yellow-500/5">
+                <div>
+                    <p class="text-[10px] font-black text-yellow-500 uppercase">Next Milestone</p>
+                    <h2 id="next-rank-display" class="text-2xl font-black orbitron text-white italic">STAR</h2>
+                </div>
+                <i data-lucide="award" class="w-12 h-12 text-yellow-500"></i>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div class="premium-border p-5 text-center flex flex-col items-center justify-center">
+                <i data-lucide="users" class="w-8 h-8 text-blue-400 mb-2"></i>
+                <p class="text-[8px] font-bold text-gray-400 uppercase">Direct Partners</p>
+                <h3 id="direct-count" class="text-lg font-black orbitron text-white">0</h3>
+            </div>
+            <div class="premium-border p-5 text-center flex flex-col items-center justify-center">
+                <i data-lucide="network" class="w-8 h-8 text-purple-400 mb-2"></i>
+                <p class="text-[8px] font-bold text-gray-400 uppercase">Total Team Size</p>
+                <h3 id="team-total" class="text-lg font-black orbitron text-white">0</h3>
+            </div>
+            <div class="premium-border p-5 text-center flex flex-col items-center justify-center">
+                <i data-lucide="zap" class="w-8 h-8 text-green-400 mb-2"></i>
+                <p class="text-[8px] font-bold text-gray-400 uppercase">Active Team</p>
+                <h3 id="team-active" class="text-lg font-black orbitron text-green-400">0</h3>
+            </div>
+            <div class="premium-border p-5 text-center flex flex-col items-center justify-center border-yellow-500/20">
+                <i data-lucide="gem" class="w-8 h-8 text-yellow-500 mb-2"></i>
+                <p class="text-[8px] font-bold text-gray-400 uppercase">Level Income</p>
+                <h3 class="text-lg font-black orbitron flex items-center text-yellow-500">
+                    <img src="https://cryptologos.cc/logos/tether-usdt-logo.svg" class="usdt-icon">
+                    <span id="level-earnings">0.00</span>
+                </h3>
+            </div>
+        </div>
+
+        <div class="premium-border p-6 md:p-8 mb-8">
+            <div class="flex items-center gap-3 mb-6">
+                <i data-lucide="trending-up" class="w-6 h-6 text-green-500"></i>
+                <h3 class="text-xl font-black orbitron uppercase italic">Progress to <span id="target-rank-name" class="text-green-500">STAR</span></h3>
+            </div>
+            <div class="space-y-6">
+                <div class="space-y-3">
+                    <div class="flex justify-between items-end">
+                        <div>
+                            <p class="text-[10px] font-bold text-gray-400 uppercase">Direct Referrals Required</p>
+                            <p class="text-lg font-black orbitron"><span id="current-directs">0</span> <span id="target-directs" class="text-xs text-gray-500 italic">/ 1</span></p>
+                        </div>
+                        <p id="rank-percent" class="text-green-500 font-black orbitron">0%</p>
+                    </div>
+                    <div class="h-3 bg-white/5 rounded-full overflow-hidden border border-white/10">
+                        <div id="rank-progress-bar" class="progress-bar h-full bg-gradient-to-r from-green-600 to-emerald-400" style="width: 0%"></div>
+                    </div>
+                    <p class="text-[9px] text-gray-500 italic">Note: Next rank unlocks deeper level incomes and higher ROI potential.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="premium-border p-6 md:p-8 mb-8">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-black orbitron uppercase italic"><span class="text-green-500">Level 1</span> Downlines</h3>
+                <div class="flex gap-2">
+                    <button onclick="loadLevel(1)" class="px-3 py-1 bg-green-500/20 rounded-md text-[10px] font-bold border border-green-500/30">L1</button>
+                    <button onclick="loadLevel(2)" class="px-3 py-1 bg-white/5 rounded-md text-[10px] font-bold border border-white/10">L2</button>
+                    <button onclick="loadLevel(3)" class="px-3 py-1 bg-white/5 rounded-md text-[10px] font-bold border border-white/10">L3</button>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="text-[10px] uppercase text-gray-500 border-b border-white/10">
+                            <th class="p-4">Username</th>
+                            <th>Wallet Address</th>
+                            <th>Package</th>
+                            <th>Join Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="team-table-body" class="text-gray-300 text-xs font-mono">
+                        <tr>
+                            <td colspan="4" class="p-8 text-center text-gray-500 italic">Loading team data...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="premium-border p-6 md:p-8">
+            <h3 class="text-xl font-black orbitron uppercase italic mb-6"><span class="text-yellow-500">Rank</span> Structure</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="text-[10px] uppercase text-gray-500 border-b border-white/10">
+                            <th class="p-4">Rank</th>
+                            <th>Requirement</th>
+                            <th>Benefits</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-gray-300 text-xs font-mono">
+                        <tr class="border-b border-white/5"><td class="p-4 font-bold text-white">USER</td><td>Registration</td><td>Standard ROI</td></tr>
+                        <tr class="border-b border-white/5"><td class="p-4 font-bold text-yellow-500">STAR</td><td>1 Direct Active</td><td>Level 1 ROI Unlock</td></tr>
+                        <tr class="border-b border-white/5"><td class="p-4 font-bold text-yellow-500">LEADER</td><td>2 Directs Active</td><td>Level 2 ROI Unlock</td></tr>
+                        <tr class="border-b border-white/5"><td class="p-4 font-bold text-yellow-500">DIRECTOR</td><td>3+ Directs Active</td><td>Full Level ROI (L1-L3)</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+    <script>
+        lucide.createIcons();
+
+        // Level Switching UI Logic
+        window.loadLevel = async function(level) {
+            // Update UI buttons styling
+            const buttons = document.querySelectorAll('button[onclick^="loadLevel"]');
+            buttons.forEach((btn, idx) => {
+                if(idx + 1 === level) {
+                    btn.className = "px-3 py-1 bg-green-500/20 rounded-md text-[10px] font-bold border border-green-500/30";
+                } else {
+                    btn.className = "px-3 py-1 bg-white/5 rounded-md text-[10px] font-bold border border-white/10";
+                }
+            });
+
+            // Call the web3 handler function
+            if (window.fetchTeamData) {
+                await window.fetchTeamData(level);
+            }
+        };
+    </script>
+</body>
+</html>

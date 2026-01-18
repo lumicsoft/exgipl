@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Active Deposits | Earn USDT</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="style1.css">
+    <style>
+        .status-badge { background: rgba(34, 197, 94, 0.1); color: #22c55e; padding: 4px 12px; border-radius: 100px; font-size: 10px; font-weight: 800; text-transform: uppercase; border: 1px solid rgba(34, 197, 94, 0.3); animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+        .progress-container { background: rgba(255,255,255,0.05); height: 6px; border-radius: 10px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); }
+        .progress-bar { background: linear-gradient(90deg, #10b981, #34d399); height: 100%; box-shadow: 0 0 10px rgba(16, 185, 129, 0.4); transition: width 1s ease-in-out; }
+        .usdt-icon { width: 20px; height: 20px; display: inline-block; vertical-align: middle; margin-right: 6px; }
+        .usdt-icon-sm { width: 14px; height: 14px; display: inline-block; vertical-align: middle; margin-right: 4px; }
+        .premium-border { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 24px; }
+    </style>
+</head>
+<body class="bg-[#050505] text-white">
+
+    <div id="nav-placeholder"></div>
+
+    <main class="max-w-7xl mx-auto px-6 relative z-10 pt-10">
+        <div class="flex justify-between items-center mb-10">
+            <div>
+                <h1 class="text-3xl font-black orbitron italic uppercase tracking-tighter">Active <span class="text-green-500">Nodes</span></h1>
+                <p class="text-gray-400 text-[10px] font-bold uppercase tracking-[0.2em]">Your USDT mining performance</p>
+            </div>
+            <button onclick="loadActiveDeposits()" class="bg-white/5 border border-white/10 p-2 rounded-lg hover:bg-white/10 transition-all">
+                <i data-lucide="refresh-cw" class="w-5 h-5 text-green-500"></i>
+            </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+            <div class="premium-border p-6 text-center border-white/10">
+                <p class="text-[10px] font-black text-gray-400 uppercase mb-1">Total Active Capital</p>
+                <h3 class="text-2xl font-black orbitron text-white flex items-center justify-center">
+                    <img src="https://cryptologos.cc/logos/tether-usdt-logo.svg" class="usdt-icon">
+                    <span id="total-active-capital">0.00</span>
+                </h3>
+            </div>
+            <div class="premium-border p-6 text-center border-green-500/20">
+                <p class="text-[10px] font-black text-green-500 uppercase mb-1">24H Projected Yield</p>
+                <h3 class="text-2xl font-black orbitron text-green-400 flex items-center justify-center">
+                    <img src="https://cryptologos.cc/logos/tether-usdt-logo.svg" class="usdt-icon">
+                    <span id="total-daily-profit">0.00</span>
+                </h3>
+            </div>
+        </div>
+
+        <div id="deposits-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pb-20">
+            <div class="col-span-full text-center py-20">
+                <div class="inline-block animate-spin text-green-500 mb-4">
+                    <i data-lucide="refresh-cw" class="w-10 h-10"></i>
+                </div>
+                <p class="orbitron text-xs text-gray-500 uppercase tracking-widest">Accessing Smart Contract...</p>
+            </div>
+        </div>
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+    <script src="components.js"></script>
+    <script src="web3-handler.js"></script>
+    <script>
+    // 1. Updated ROI Tiers for USDT Contract
+    function getGlobalROI(totalAmount) {
+        const amt = parseFloat(totalAmount);
+        if (amt >= 2000) return 6.00;  // High Tier
+        if (amt >= 1000) return 5.75;
+        if (amt >= 400)  return 5.50;
+        if (amt >= 200)  return 5.25;
+        return 5.00;                   // Base Tier
+    }
+
+    async function loadActiveDeposits() {
+        const grid = document.getElementById('deposits-grid');
+        
+        if (typeof window.contract === 'undefined') {
+            setTimeout(loadActiveDeposits, 1000);
+            return;
+        }
+
+        try {
+            const address = await window.signer.getAddress();
+            const userData = await window.contract.users(address);
+            
+            // Note: Contract uses 18 decimals for USDT (standard)
+            const totalActive = parseFloat(ethers.utils.formatUnits(userData.totalActiveDeposit, 18));
+            document.getElementById('total-active-capital').innerText = totalActive.toFixed(2);
+
+            if (totalActive <= 0) {
+                document.getElementById('total-daily-profit').innerText = `0.00`;
+                grid.innerHTML = `<div class="col-span-full text-center py-20 text-gray-500 orbitron text-xs border border-dashed border-white/10 rounded-3xl">NO ACTIVE NODES DETECTED</div>`;
+                return;
+            }
+
+            const globalROIRate = getGlobalROI(totalActive);
+            const totalDailyProfit = (totalActive * (globalROIRate / 100));
+            document.getElementById('total-daily-profit').innerText = totalDailyProfit.toFixed(2);
+
+            let html = '';
+            let foundAny = false;
+
+            // Loop through positions (MasterMLM usually stores them in an array or mapping)
+            for (let i = 0; i < 50; i++) {
+                try {
+                    const pos = await window.contract.getPosition(address, i);
+                    const amount = parseFloat(ethers.utils.formatUnits(pos.amount, 18));
+                    
+                    if (amount === 0) break;
+
+                    if (pos.active) {
+                        foundAny = true;
+                        const cardDailyYield = (amount * (globalROIRate / 100));
+                        const startTime = parseInt(pos.startTime);
+                        const endTime = parseInt(pos.endTime);
+                        const currentTime = Math.floor(Date.now() / 1000);
+                        
+                        const totalDuration = endTime - startTime;
+                        const elapsed = currentTime - startTime;
+                        
+                        // Progress to 300% (or contract duration)
+                        let progress = ((elapsed / totalDuration) * 100).toFixed(2);
+                        if (progress > 100) progress = 100;
+                        if (progress < 0) progress = 0;
+
+                        html += `
+                        <div class="premium-border p-8 hover:translate-y-[-5px] transition-all duration-300 bg-gradient-to-br from-white/[0.03] to-transparent">
+                            <div class="flex justify-between items-start mb-6">
+                                <div>
+                                    <h3 class="text-xl font-black orbitron italic text-white flex items-center">
+                                        <img src="https://cryptologos.cc/logos/tether-usdt-logo.svg" class="usdt-icon-sm">
+                                        ${amount.toFixed(2)}
+                                    </h3>
+                                    <p class="text-[9px] text-green-500 font-bold uppercase tracking-widest mt-1 italic">${globalROIRate.toFixed(2)}% Daily Yield</p>
+                                </div>
+                                <span class="status-badge">Mining</span>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4 mb-8">
+                                <div class="bg-white/5 rounded-2xl p-4 border border-white/5 text-center">
+                                    <p class="text-[9px] font-black text-gray-400 uppercase mb-1">Source</p>
+                                    <p class="text-[10px] font-black orbitron text-green-500">${pos.source == 1 ? 'RE-INVESTED' : 'DIRECT'}</p>
+                                </div>
+                                <div class="bg-white/5 rounded-2xl p-4 border border-white/5 text-center">
+                                    <p class="text-[9px] font-black text-gray-400 uppercase mb-1">Daily Profit</p>
+                                    <p class="text-xs font-black orbitron text-white flex items-center justify-center">
+                                        +${cardDailyYield.toFixed(2)}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="space-y-4">
+                                <div class="flex justify-between text-[10px] font-black orbitron uppercase">
+                                    <span class="text-gray-500 italic">Node Life</span>
+                                    <span class="text-green-500">${progress}%</span>
+                                </div>
+                                <div class="progress-container">
+                                    <div class="progress-bar" style="width: ${progress}%"></div>
+                                </div>
+                                <div class="flex justify-between items-center text-[8px] text-gray-500 uppercase font-bold">
+                                    <span>Started: ${new Date(startTime * 1000).toLocaleDateString()}</span>
+                                    <span>Ends: 300% Target</span>
+                                </div>
+                            </div>
+                        </div>`;
+                    }
+                } catch (e) { break; }
+            }
+
+            grid.innerHTML = foundAny ? html : `<div class="col-span-full text-center py-20 text-gray-500">NO ACTIVE MINING NODES</div>`;
+            if (window.lucide) lucide.createIcons();
+
+        } catch (err) {
+            console.error(err);
+            grid.innerHTML = `<div class="col-span-full text-center py-20 text-red-500 italic orbitron text-xs">FAILED TO CONNECT TO BLOCKCHAIN</div>`;
+        }
+    }
+
+    window.addEventListener('load', () => setTimeout(loadActiveDeposits, 1500));
+</script>
+</body>
+</html>

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network System | Earn USDT</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="style1.css">
+    <style>
+        .usdt-icon { width: 18px; height: 18px; display: inline-block; vertical-align: middle; margin-right: 4px; }
+        .usdt-icon-lg { width: 30px; height: 30px; display: inline-block; vertical-align: middle; margin-right: 8px; }
+        .usdt-icon-sm { width: 14px; height: 14px; display: inline-block; vertical-align: middle; margin-right: 2px; }
+        
+        /* Premium Emerald Button for USDT Theme */
+        .compound-btn-emerald {
+            background: #000000 !important;
+            color: #10b981 !important;
+            border: 1px solid #10b981 !important;
+            transition: all 0.3s ease;
+        }
+        .compound-btn-emerald:hover {
+            background: #10b981 !important;
+            color: #000000 !important;
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+        }
+        .gold-btn { background: #10b981; color: black; font-weight: 900; border-radius: 12px; transition: all 0.3s; }
+        .gold-btn:hover { background: #34d399; transform: scale(1.02); }
+    </style>
+</head>
+<body class="bg-[#050505] text-white">
+
+    <main class="max-w-7xl mx-auto px-6 relative z-10 pt-10">
+        
+        <div class="premium-border p-6 mb-8 bg-green-500/5 border-green-500/20">
+            <p class="text-[10px] font-black orbitron text-green-500 uppercase mb-3 tracking-widest">Your Referral Link</p>
+            <div class="flex items-center gap-3 bg-black/40 p-2 pl-4 rounded-xl border border-white/10">
+                <input id="refURL" type="text" readonly value="Connecting wallet..." class="bg-transparent border-none outline-none w-full text-xs text-gray-300 font-mono">
+                <button onclick="copyLink()" class="gold-btn px-6 py-2">COPY</button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div class="premium-border p-5 text-center flex flex-col items-center">
+                <i data-lucide="users" class="w-6 h-6 text-blue-400 mb-2"></i>
+                <p class="text-[8px] font-bold text-gray-400 uppercase">Direct Partners</p>
+                <h3 id="direct-count" class="text-xl font-black orbitron">0</h3>
+            </div>
+            <div class="premium-border p-5 text-center flex flex-col items-center">
+                <i data-lucide="network" class="w-6 h-6 text-purple-400 mb-2"></i>
+                <p class="text-[8px] font-bold text-gray-400 uppercase">Total Network</p>
+                <h3 id="team-count" class="text-xl font-black orbitron">0</h3>
+            </div>
+            <div class="premium-border p-5 text-center flex flex-col items-center">
+                <i data-lucide="banknote" class="w-6 h-6 text-green-500 mb-2"></i>
+                <p class="text-[8px] font-bold text-gray-400 uppercase">Total Earned</p>
+                <h3 class="text-xl font-black orbitron flex items-center">
+                    <img src="https://cryptologos.cc/logos/tether-usdt-logo.svg" class="usdt-icon">
+                    <span id="total-earned">0.00</span>
+                </h3>
+            </div>
+            <div class="premium-border p-5 text-center flex flex-col items-center">
+                <i data-lucide="layers" class="w-6 h-6 text-yellow-500 mb-2"></i>
+                <p class="text-[8px] font-bold text-gray-400 uppercase">Level Rewards</p>
+                <h3 class="text-xl font-black orbitron flex items-center text-yellow-500">
+                    <img src="https://cryptologos.cc/logos/tether-usdt-logo.svg" class="usdt-icon">
+                    <span id="level-earnings">0.00</span>
+                </h3>
+            </div>
+        </div>
+
+        <div class="premium-border p-6 mb-8 text-center border-green-500/30 bg-green-500/5">
+            <p class="text-[10px] font-bold text-gray-400 uppercase mb-1 tracking-widest">Available Network Income</p>
+            <h2 class="text-3xl font-black orbitron text-white italic mb-6 flex items-center justify-center">
+                <img src="https://cryptologos.cc/logos/tether-usdt-logo.svg" class="usdt-icon-lg">
+                <span id="ref-balance-display">0.00</span>
+            </h2>
+            <div class="flex flex-col md:flex-row gap-3">
+                <button onclick="handleClaim()" class="gold-btn flex-1 !py-4 flex items-center justify-center gap-2">
+                    <i data-lucide="download" class="w-4 h-4"></i> Withdraw to Wallet
+                </button>
+                <button onclick="handleCompoundDaily()" class="gold-btn compound-btn-emerald flex-1 !py-4 flex items-center justify-center gap-2">
+                    <i data-lucide="refresh-cw" class="w-4 h-4"></i> Re-invest (Compound)
+                </button>
+            </div>
+        </div>
+
+        <div class="premium-border mb-8 p-6 md:p-8">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+                <h3 class="text-xl font-black orbitron uppercase italic"><span class="text-green-500">Team</span> Report</h3>
+                <div class="flex items-center gap-3 bg-black/50 p-2 rounded-xl border border-white/10 w-full md:w-auto">
+                    <span class="text-[10px] font-bold uppercase text-gray-400 ml-2">Select Level:</span>
+                    <select id="levelSelect" onchange="loadLevelData(this.value)" class="bg-transparent text-green-500 font-bold outline-none cursor-pointer text-sm">
+                        <option value="1">Level 1 (Direct)</option>
+                        <option value="2">Level 2</option>
+                        <option value="3">Level 3</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="text-[10px] uppercase text-gray-500 border-b border-white/10">
+                            <th class="p-4">Partner</th>
+                            <th>Wallet</th>
+                            <th>Package</th>
+                            <th>Team Size</th>
+                            <th>Join Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="team-table-body" class="text-gray-300 text-xs">
+                        <tr>
+                            <td colspan="5" class="p-10 text-center text-gray-500 italic">Connect wallet to view network</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+    <script src="components.js"></script>
+    <script src="web3-handler.js"></script>
+    <script>
+    lucide.createIcons();
+
+    async function loadReferralData() {
+        if (typeof window.contract === 'undefined' || !window.signer) {
+            setTimeout(loadReferralData, 1000);
+            return;
+        }
+
+        try {
+            const address = await window.signer.getAddress();
+            // Contract v4 Dashboard contains consolidated data
+            const dash = await window.contract.getUserDashboard(address);
+            const user = await window.contract.users(address);
+
+            // Update stats
+            document.getElementById('direct-count').innerText = user.directCount.toString();
+            document.getElementById('team-count').innerText = (dash.totalTeamActive.toNumber() + dash.totalTeamInactive.toNumber()).toString();
+            
+            // USDT format (18 decimals in contract)
+            const earned = ethers.utils.formatUnits(dash.totalLevelIncome, 18);
+            document.getElementById('total-earned').innerText = parseFloat(earned).toFixed(2);
+            document.getElementById('level-earnings').innerText = parseFloat(earned).toFixed(2);
+
+            // Available Income
+            const available = ethers.utils.formatUnits(dash.availableWithdraw, 18);
+            document.getElementById('ref-balance-display').innerText = parseFloat(available).toFixed(2);
+            window.currentRefBalance = dash.availableWithdraw;
+
+            // Link Generation
+            const baseUrl = window.location.origin + window.location.pathname.replace('referral.html', '').replace('referral.html', '');
+            document.getElementById('refURL').value = `${baseUrl}register.html?ref=${user.username}`;
+
+            loadLevelData(1);
+        } catch (err) { 
+            console.error("Network Page Error:", err); 
+        }
+    }
+
+    async function loadLevelData(level) {
+        const tableBody = document.getElementById('team-table-body');
+        tableBody.innerHTML = `<tr><td colspan="5" class="p-10 text-center text-green-500 orbitron animate-pulse">FETCHING LEVEL ${level}...</td></tr>`;
+
+        try {
+            const address = await window.signer.getAddress();
+            // Contract Function: getLevelTeamDetails(address, level)
+            const team = await window.contract.getLevelTeamDetails(address, level);
+            
+            if (!team || team.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="5" class="p-10 text-center text-gray-500 italic">No partners found in Level ${level}</td></tr>`;
+                return;
+            }
+
+            let html = '';
+            team.forEach(m => {
+                const pkg = ethers.utils.formatUnits(m.package, 18);
+                const date = new Date(m.joinTime.toNumber() * 1000).toLocaleDateString();
+                
+                html += `
+                <tr class="border-b border-white/5 hover:bg-white/10 transition-colors">
+                    <td class="p-4 font-bold text-white">${m.username}</td>
+                    <td class="p-4 font-mono text-gray-500 text-[10px]">${m.userAddress.substring(0,6)}...${m.userAddress.substring(36)}</td>
+                    <td class="p-4"><span class="bg-green-500/10 text-green-500 px-2 py-1 rounded text-[10px] font-bold">${parseFloat(pkg).toFixed(0)} USDT</span></td>
+                    <td class="p-4 text-gray-400 font-bold">${m.teamCount}</td>
+                    <td class="p-4 text-gray-500">${date}</td>
+                </tr>`;
+            });
+            tableBody.innerHTML = html;
+        } catch (err) {
+            tableBody.innerHTML = `<tr><td colspan="5" class="p-10 text-center text-red-500">Level Data Unavailable</td></tr>`;
+        }
+    }
+
+    window.handleClaim = async function() {
+        try {
+            const tx = await window.contract.withdraw();
+            alert("Withdrawal Transaction Sent!");
+            await tx.wait();
+            loadReferralData();
+        } catch (e) { alert("Withdrawal Failed"); }
+    }
+
+    window.handleCompoundDaily = async function() {
+        try {
+            const tx = await window.contract.compound();
+            alert("Compounding Transaction Sent!");
+            await tx.wait();
+            loadReferralData();
+        } catch (e) { alert("Compounding Failed"); }
+    }
+
+    window.copyLink = function() {
+        const copyText = document.getElementById("refURL");
+        copyText.select();
+        navigator.clipboard.writeText(copyText.value);
+        alert("Referral Link Copied!");
+    }
+
+    window.addEventListener('load', () => setTimeout(loadReferralData, 1200));
+</script>
+</body>
+</html>

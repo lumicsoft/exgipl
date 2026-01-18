@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Earn USDT</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="style1.css">
+    <style>
+        .withdraw-btn { background: linear-gradient(135deg, #22c55e, #16a34a) !important; color: white !important; }
+        .capital-btn { background: linear-gradient(135deg, #3b82f6, #2563eb) !important; color: white !important; }
+        .animate-spin-slow { animation: spin 8s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .deposit-input-box { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); padding: 12px; border-radius: 12px; width: 100%; color: white; outline: none; transition: 0.3s; }
+        .deposit-input-box:focus { border-color: #22c55e; box-shadow: 0 0 15px rgba(34, 197, 94, 0.2); }
+        .usdt-logo-img { width: 20px; height: 20px; display: inline-block; vertical-align: middle; margin-right: 8px; }
+        .usdt-logo-large { width: 40px; height: 40px; display: inline-block; vertical-align: middle; margin-right: 12px; }
+        .luxury-table { width: 100%; border-collapse: collapse; }
+        .luxury-table th { padding: 15px; text-align: left; border-bottom: 2px solid rgba(34, 197, 94, 0.2); color: #22c55e; font-size: 12px; font-family: 'Orbitron'; }
+        .luxury-table td { padding: 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); font-size: 14px; font-weight: 600; }
+    </style>
+</head>
+<body class="bg-[#050505] text-white"> 
+
+    <main class="max-w-7xl mx-auto px-6 relative z-10 pt-10">
+        <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-8">
+            <div class="premium-border p-4 text-center">
+                <p class="text-[9px] font-bold text-gray-400 uppercase">Available Balance</p>
+                <h3 class="text-lg font-black orbitron flex items-center justify-center text-yellow-500">
+                    <img src="https://cryptologos.cc/logos/tether-usdt-logo.svg" class="usdt-logo-img">
+                    <span id="available-balance">0.00</span>
+                </h3>
+            </div>
+            <div class="premium-border p-4 text-center">
+                <p class="text-[9px] font-bold text-gray-400 uppercase">Total Earned</p>
+                <h3 class="text-lg font-black orbitron text-green-500 flex items-center justify-center">
+                    <img src="https://cryptologos.cc/logos/tether-usdt-logo.svg" class="usdt-logo-img">
+                    <span id="total-earned">0.00</span>
+                </h3>
+            </div>
+            <div class="premium-border p-4 text-center">
+                <p class="text-[9px] font-bold text-gray-400 uppercase">Level Income</p>
+                <h3 class="text-lg font-black orbitron text-cyan-400 flex items-center justify-center">
+                    <img src="https://cryptologos.cc/logos/tether-usdt-logo.svg" class="usdt-logo-img">
+                    <span id="level-earnings">0.00</span>
+                </h3>
+            </div>
+            <div class="premium-border p-4 text-center">
+                <p class="text-[9px] font-bold text-gray-400 uppercase">ROI Earnings</p>
+                <h3 class="text-lg font-black orbitron text-emerald-400 flex items-center justify-center">
+                    <img src="https://cryptologos.cc/logos/tether-usdt-logo.svg" class="usdt-logo-img">
+                    <span id="roi-earnings">0.00</span>
+                </h3>
+            </div>
+            <div class="premium-border p-4 text-center">
+                <p class="text-[9px] font-bold text-yellow-500 uppercase">Directs</p> 
+                <h3 id="direct-count" class="text-lg font-black orbitron text-yellow-500 uppercase">0</h3>
+            </div>
+            <div class="premium-border p-4 text-center">
+                <p class="text-[9px] font-bold text-red-400 uppercase">Total Withdrawal</p>
+                <h3 class="text-lg font-black orbitron text-red-400 flex items-center justify-center">
+                    <img src="https://cryptologos.cc/logos/tether-usdt-logo.svg" class="usdt-logo-img">
+                    <span id="total-withdrawn">0.00</span>
+                </h3>
+            </div>
+        </div>
+
+        <div class="premium-border p-6 mb-8">
+            <p class="text-[10px] font-black orbitron text-green-500 uppercase mb-3">Referral Link</p>
+            <div class="flex items-center gap-3 bg-black/40 p-2 pl-4 rounded-xl border border-white/10">
+                <input id="refURL" type="text" readonly value="Connect wallet to see link..." class="bg-transparent border-none outline-none w-full text-xs text-gray-300 font-mono">
+                <button onclick="copyLink()" class="bg-green-600 px-6 py-2 rounded-lg font-bold text-xs">COPY</button>
+            </div>
+        </div>
+
+        <div class="premium-border p-6 mb-8 bg-green-500/5 border-green-500/20">
+            <div class="flex flex-col md:flex-row items-center gap-4">
+                <div class="w-full md:w-1/2">
+                    <p class="text-[10px] font-black orbitron text-green-500 uppercase mb-2 ml-1">Investment Amount (USDT)</p>
+                    <input type="number" id="deposit-amount" placeholder="Min 10 USDT" class="deposit-input-box font-black orbitron text-lg">
+                </div>
+                <div class="w-full md:w-1/2 md:pt-6">
+                    <button onclick="handleDeposit()" id="deposit-btn" class="w-full py-4 rounded-xl orbitron font-black tracking-widest bg-gradient-to-r from-green-500 to-emerald-700 hover:scale-[1.02] transition-all">
+                        INVEST USDT <i data-lucide="shield-check" class="w-4 h-4 inline-block ml-1"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="premium-border p-8 mb-6 text-center bg-emerald-950/20 border-green-500/30">
+            <div class="relative z-10">
+                <i data-lucide="wallet" class="w-8 h-8 text-green-500 mx-auto mb-2"></i>
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Withdrawable Working Balance</p>
+                <h3 class="text-4xl font-black orbitron text-white mb-8 flex items-center justify-center gap-2">
+                    <img src="https://cryptologos.cc/logos/tether-usdt-logo.svg" class="usdt-logo-large">
+                    <span id="available-balance-main">0.00</span>
+                </h3>
+                <div class="flex justify-center">
+                    <button onclick="handleWithdrawWorking()" class="withdraw-btn px-16 py-4 rounded-full font-black orbitron tracking-widest hover:shadow-[0_0_20px_rgba(34,197,94,0.4)] transition-all">
+                        WITHDRAW INCOME <i data-lucide="arrow-down-to-line" class="w-4 h-4 inline-block ml-2"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="premium-border p-8 md:p-12 mb-8">
+            <div class="relative z-10">
+                <div class="flex justify-between items-center mb-10">
+                    <h2 class="text-xl font-black orbitron italic uppercase">Account <span class="text-green-400">Overview</span></h2>
+                    <span id="status-badge" class="px-4 py-1 rounded-full bg-red-500/20 text-red-500 text-[10px] font-black border border-red-500/30 uppercase">● Inactive Status</span>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                    <div class="lg:col-span-4 bg-black/50 rounded-[32px] p-10 border border-white/10 text-center">
+                        <p class="text-xs font-black text-gray-400 uppercase mb-4">Team Performance</p>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-[9px] text-gray-500">Active Team</p>
+                                <p id="team-active" class="text-xl font-bold text-green-500">0</p>
+                            </div>
+                            <div>
+                                <p class="text-[9px] text-gray-500">Total Team</p>
+                                <p id="team-total" class="text-xl font-bold text-white">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="inner-plate p-8 bg-black/20 rounded-2xl border border-white/5">
+                            <p class="text-xs font-black text-green-500 uppercase mb-2">My Daily ROI</p>
+                            <h4 class="text-4xl font-black orbitron text-white flex items-center">
+                                <span id="daily-roi-rate">0.00%</span>
+                            </h4>
+                            <p class="text-[10px] text-gray-400 uppercase mt-2">Based on active package</p>
+                        </div>
+                        <div class="inner-plate p-8 bg-black/20 rounded-2xl border border-white/5">
+                            <p class="text-xs font-black text-green-500 uppercase mb-2">Next ROI Release</p>
+                            <h4 id="next-timer" class="text-4xl font-black orbitron text-white">00:00:00</h4>
+                            <p class="text-[10px] text-green-400 uppercase mt-2 tracking-widest italic font-bold">Auto-Release Enabled</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="premium-border mb-8">
+            <div class="relative z-10 p-6 md:p-8">
+                <h3 class="text-xl font-black orbitron mb-6 uppercase italic"><span class="text-green-500">Investment</span> Slabs</h3>
+                <div class="overflow-x-auto">
+                    <table class="luxury-table">
+                        <thead>
+                            <tr>
+                                <th>Investment Range (USDT)</th>
+                                <th>Monthly ROI</th>
+                                <th>Daily Equivalent</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-b border-white/5">
+                                <td>10 USDT - 1,000 USDT</td>
+                                <td class="text-green-400 font-bold">28.5%</td>
+                                <td>0.95%</td>
+                            </tr>
+                            <tr class="border-b border-white/5">
+                                <td>1,001 USDT - 2,500 USDT</td>
+                                <td class="text-green-400 font-bold">32.1%</td>
+                                <td>1.07%</td>
+                            </tr>
+                            <tr class="border-b border-white/5 bg-green-500/5">
+                                <td>2,501 USDT - 5,000 USDT</td>
+                                <td class="text-green-400 font-bold">36.0%</td>
+                                <td>1.20%</td>
+                            </tr>
+                            <tr class="bg-green-500/10">
+                                <td class="text-green-400 font-black text-lg">5,001 USDT+</td>
+                                <td class="text-green-400 font-black text-lg">40.0%</td>
+                                <td class="text-green-400 font-black text-lg">1.33%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+    </body>
+</html>

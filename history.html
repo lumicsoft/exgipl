@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction History | Earn USDT</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="style1.css">
+    <style>
+        .filter-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #888; padding: 10px 20px; border-radius: 12px;
+            font-size: 10px; font-weight: 800; text-transform: uppercase;
+            transition: all 0.3s;
+        }
+        .filter-btn.active {
+            background: #10b981;
+            color: black;
+            border-color: #10b981;
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+        }
+        .history-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px; padding: 20px;
+            transition: all 0.3s;
+        }
+        .history-card:hover { border-color: rgba(16, 185, 129, 0.3); background: rgba(16, 185, 129, 0.02); }
+        .usdt-icon-sm { width: 14px; height: 14px; display: inline-block; vertical-align: middle; margin-right: 4px; }
+    </style>
+</head>
+<body class="bg-[#050505] text-white">
+
+    <main class="max-w-7xl mx-auto px-6 relative z-10 pt-10">
+        
+        <div class="mb-10 text-center">
+            <h1 class="text-3xl font-black orbitron italic uppercase tracking-tighter">Activity <span class="text-emerald-500">Logs</span></h1>
+            <p class="text-gray-400 text-[10px] font-bold uppercase tracking-[0.2em]">Verified Blockchain Transactions (USDT)</p>
+        </div>
+
+        <div class="premium-border p-4 mb-8 bg-white/5">
+            <div class="flex flex-wrap justify-center gap-2 md:gap-4">
+                <button onclick="showHistory('deposit')" id="btn-deposit" class="filter-btn active">Stake/Deposit</button>
+                <button onclick="showHistory('compounding')" id="btn-compounding" class="filter-btn">Compound</button>
+                <button onclick="showHistory('income')" id="btn-income" class="filter-btn">Earnings</button>
+                <button onclick="showHistory('withdrawal')" id="btn-withdrawal" class="filter-btn">Withdrawals</button>
+            </div>
+        </div>
+
+        <div id="history-container" class="space-y-4 pb-20">
+            <div class="text-center py-20 text-gray-500 orbitron animate-pulse text-xs uppercase tracking-widest">
+                Scanning Blockchain for Events...
+            </div>
+        </div>
+
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+    <script src="components.js"></script>
+    <script src="web3-handler.js"></script>
+    
+    <script>
+        lucide.createIcons();
+
+        async function showHistory(type) {
+            const container = document.getElementById('history-container');
+            const buttons = document.querySelectorAll('.filter-btn');
+            
+            // UI Update: Button Active State
+            buttons.forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.getElementById('btn-' + type);
+            if(activeBtn) activeBtn.classList.add('active');
+
+            // Show Loading
+            container.innerHTML = `
+                <div class="text-center py-20">
+                    <div class="inline-block animate-spin mb-4 text-emerald-500">
+                        <i data-lucide="loader-2" class="w-8 h-8"></i>
+                    </div>
+                    <p class="text-[10px] font-bold text-gray-500 orbitron uppercase tracking-widest">Querying Smart Contract...</p>
+                </div>
+            `;
+            lucide.createIcons();
+
+            try {
+                // web3-handler.js should have fetchBlockchainHistory(type)
+                // If it's a new contract, ensure fetchBlockchainHistory is updated to parse NewDeposit, Withdrawn, etc.
+                const logs = await window.fetchBlockchainHistory(type);
+
+                if(!logs || logs.length === 0) {
+                    container.innerHTML = `
+                        <div class="text-center py-20 border border-dashed border-white/5 rounded-3xl">
+                            <i data-lucide="folder-open" class="w-10 h-10 text-gray-800 mx-auto mb-3"></i>
+                            <p class="text-gray-500 text-[10px] font-bold orbitron uppercase tracking-widest">No transaction data found</p>
+                        </div>
+                    `;
+                    lucide.createIcons();
+                    return;
+                }
+
+                let html = '';
+                logs.forEach(item => {
+                    const statusColor = item.color || 'text-emerald-400';
+                    const isPositive = type === 'deposit' || type === 'income' || type === 'compounding';
+
+                    html += `
+                    <div class="history-card">
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center border border-white/10">
+                                    <i data-lucide="${getIcon(type)}" class="w-5 h-5 ${statusColor}"></i>
+                                </div>
+                                <div>
+                                    <p class="text-[10px] font-black ${statusColor} uppercase tracking-tighter">${item.type || type.toUpperCase()}</p>
+                                    <p class="text-[10px] font-bold text-gray-500 uppercase mt-0.5">${item.date} • <span class="text-gray-600 font-mono">${item.time}</span></p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <h3 class="text-lg font-black orbitron ${isPositive ? 'text-green-400' : 'text-emerald-200'} flex items-center justify-end">
+                                    <span class="mr-1 text-sm font-light">${isPositive ? '+' : '-'}</span>
+                                    <img src="https://cryptologos.cc/logos/tether-usdt-logo.svg" class="usdt-icon-sm">
+                                    ${parseFloat(item.amount).toFixed(2)}
+                                </h3>
+                                <p class="text-[8px] text-gray-600 font-bold uppercase tracking-widest flex items-center justify-end gap-1">
+                                    <i data-lucide="shield-check" class="w-2.5 h-2.5"></i> Blockchain Verified
+                                </p>
+                            </div>
+                        </div>
+                        ${item.extra ? `
+                            <div class="mt-4 pt-3 border-t border-white/5">
+                                <span class="text-[9px] text-emerald-500/60 font-bold uppercase tracking-widest flex items-center gap-1">
+                                    <i data-lucide="info" class="w-3 h-3"></i> ${item.extra}
+                                </span>
+                            </div>
+                        ` : ''}
+                    </div>`;
+                });
+
+                container.innerHTML = html;
+                lucide.createIcons();
+
+            } catch (err) {
+                console.error("History UI Error:", err);
+                container.innerHTML = `<div class="text-center py-20 text-red-500 text-xs font-bold uppercase">Blockchain Sync Failure</div>`;
+            }
+        }
+
+        function getIcon(type) {
+            switch(type) {
+                case 'deposit': return 'arrow-up-right';
+                case 'compounding': return 'refresh-cw';
+                case 'income': return 'trending-up';
+                case 'withdrawal': return 'external-link';
+                default: return 'activity';
+            }
+        }
+
+        // Initialize
+        window.addEventListener('load', () => {
+            const checkInit = setInterval(() => {
+                if (window.signer && window.contract) {
+                    showHistory('deposit');
+                    clearInterval(checkInit);
+                }
+            }, 800);
+        });
+    </script>
+</body>
+</html>
