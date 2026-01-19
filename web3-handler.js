@@ -1,9 +1,9 @@
 let provider, signer, contract, usdtContract;
 
 // --- CONFIGURATION ---
-const CONTRACT_ADDRESS = "0xYour_New_Contract_Address"; // Apna naya address yahan dalein
-const USDT_ADDRESS = "0x55d398326f99059fF775485246999027B3197955"; // BSC Mainnet USDT
-const CHAIN_ID = 56; 
+const CONTRACT_ADDRESS = "0x5e5349C0212196B96e7Df8dca42D861ffA7f78A0"; // Apna naya address yahan dalein
+const USDT_ADDRESS = "0x3b66b1e08f55af26c8ea14a73da64b6bc8d799de"; // BSC Mainnet USDT
+const CHAIN_ID = 97; 
 
 // --- RANK CONFIG ---
 const RANK_DETAILS = [
@@ -186,5 +186,6 @@ function startCountdown() {
         timerEl.innerText = `${h}:${m}:${s}`;
     }, 1000);
 }
+
 
 window.addEventListener('load', init);
